@@ -29,10 +29,7 @@ export class UsersService {
     users.push(newUser);
     return newUser;
   }
-  changePassword(
-    userId: string,
-    passwordDto: ChangePasswordDto,
-  ): User | HttpException {
+  changePassword(userId: string, passwordDto: ChangePasswordDto): User {
     if (!validate(userId)) throw new HttpException('ID is not valid', 400);
     const user = users.filter((u) => u.id === userId);
     if (!user[0]) throw new HttpException('User not found', 404);
