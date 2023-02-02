@@ -36,6 +36,7 @@ export class UsersService {
     if (user[0].password !== passwordDto.oldPassword)
       throw new HttpException('Old password is wrong', 403);
     user[0].password = passwordDto.newPassword;
+    user[0].version += 1;
     return user[0];
   }
   deleteUser(userId: string): void {
