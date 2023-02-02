@@ -8,13 +8,17 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 @Injectable()
 export class UsersService {
   getAll(): User[] {
-    return users;
+    return users.map((u) => {
+      const { password, ...user } = u;
+      return user;
+    });
   }
   get(userId: string): User {
     if (!validate(userId)) throw new HttpException('ID is not valid', 400);
     const user = users.filter((u) => u.id === userId);
     if (!user[0]) throw new HttpException('User not found', 404);
-    return users[0];
+    const { password, ...newUser } = user[0];
+    return newUser;
   }
   createUser(user: CreateUserDto): User {
     if (!user.login || !user.password)
@@ -27,7 +31,8 @@ export class UsersService {
       updatedAt: Date.now(),
     };
     users.push(newUser);
-    return newUser;
+    const { password, ...returnUser } = newUser;
+    return returnUser;
   }
   changePassword(userId: string, passwordDto: ChangePasswordDto): User {
     if (!validate(userId)) throw new HttpException('ID is not valid', 400);
@@ -37,7 +42,8 @@ export class UsersService {
       throw new HttpException('Old password is wrong', 403);
     user[0].password = passwordDto.newPassword;
     user[0].version += 1;
-    return user[0];
+    const { password, ...newUser } = user[0];
+    return newUser;
   }
   deleteUser(userId: string): void {
     if (!validate(userId)) throw new HttpException('ID is not valid', 400);
