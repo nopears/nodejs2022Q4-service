@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { artists, tracks } from '../DB/DB';
+import { artists, favorites, tracks } from '../DB/DB';
 import { v4, validate } from 'uuid';
 import { Artist } from './artists.types';
 import { CreateArtistDto } from './dto/create-artist.dto';
@@ -38,5 +38,6 @@ export class ArtistsService {
     tracks.forEach((t) => {
       if (t.artistId === artistId) t.artistId = null;
     });
+    favorites.artists = favorites.artists.filter((a) => a !== artistId);
   }
 }

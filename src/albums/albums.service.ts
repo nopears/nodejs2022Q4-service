@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { albums, tracks } from '../DB/DB';
+import { albums, favorites, tracks } from '../DB/DB';
 import { Album } from './albums.types';
 import { v4, validate } from 'uuid';
 import { CreateAlbumDto } from './dto/create-album.dto';
@@ -38,5 +38,6 @@ export class AlbumsService {
     tracks.forEach((t) => {
       if (t.albumId === albumId) t.albumId = null;
     });
+    favorites.albums = favorites.albums.filter((a) => a !== albumId);
   }
 }

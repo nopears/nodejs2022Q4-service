@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { albums, artists, tracks } from '../DB/DB';
+import { favorites, tracks } from '../DB/DB';
 import { v4, validate } from 'uuid';
 import { Track } from './tracks.types';
 import { CreateTrackDto } from './dto/create-track.dto';
@@ -37,5 +37,6 @@ export class TracksService {
     if (!track) throw new HttpException('Track not found', 404);
     const tIndex = tracks.findIndex((t) => t.id === trackId);
     tracks.splice(tIndex, 1);
+    favorites.tracks = favorites.tracks.filter((t) => t !== trackId);
   }
 }
