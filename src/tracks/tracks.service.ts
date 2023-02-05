@@ -26,11 +26,6 @@ export class TracksService {
     if (!validate(trackId)) throw new HttpException('ID is not valid', 400);
     let track = tracks.filter((t) => t.id === trackId)[0];
     if (!track) throw new HttpException('Track not found', 404);
-    const artist = artists.filter((a) => a.id === album.artistId)[0];
-    if (!artist)
-      throw new HttpException('Artist not found, check artistId', 404);
-    const album = albums.filter((a) => a.id === track.albumId)[0];
-    if (!album) throw new HttpException('Album` not found, check albumId', 404);
     const tIndex = tracks.findIndex((t) => t.id === trackId);
     track = { ...track, ...trackDto };
     tracks[tIndex] = track;

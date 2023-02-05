@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { artists } from '../DB/DB';
+import { artists, tracks } from '../DB/DB';
 import { v4, validate } from 'uuid';
 import { Artist } from './artists.types';
 import { CreateArtistDto } from './dto/create-artist.dto';
@@ -35,5 +35,8 @@ export class ArtistsService {
     if (!artist) throw new HttpException('Artist not found', 404);
     const aIndex = artists.findIndex((a) => a.id === artistId);
     artists.splice(aIndex, 1);
+    tracks.forEach((t) => {
+      if (t.artistId === artistId) t.artistId = null;
+    });
   }
 }

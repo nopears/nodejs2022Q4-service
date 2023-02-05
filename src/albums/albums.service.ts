@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { albums } from '../DB/DB';
+import { albums, tracks } from '../DB/DB';
 import { Album } from './albums.types';
 import { v4, validate } from 'uuid';
 import { CreateAlbumDto } from './dto/create-album.dto';
@@ -23,6 +23,7 @@ export class AlbumsService {
   updateAlbum(albumId: string, albumDto: CreateAlbumDto): Album {
     if (!validate(albumId)) throw new HttpException('ID is not valid', 400);
     let album = albums.filter((a) => a.id === albumId)[0];
+    if (!album) throw new HttpException('Album not found', 404);
     const aIndex = albums.findIndex((a) => a.id === albumId);
     album = { ...album, ...albumDto };
     albums[aIndex] = album;
@@ -34,5 +35,8 @@ export class AlbumsService {
     if (!album) throw new HttpException('Album not found', 404);
     const aIndex = albums.findIndex((a) => a.id === albumId);
     albums.splice(aIndex, 1);
+    tracks.forEach((t) => {
+      if (t.albumId === albumId) t.albumId = null;
+    });
   }
 }
