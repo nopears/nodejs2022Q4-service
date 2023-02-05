@@ -26,7 +26,7 @@ export class UsersService {
     const newUser: User = {
       ...user,
       id: v4(),
-      version: 0,
+      version: 1,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
@@ -42,6 +42,7 @@ export class UsersService {
       throw new HttpException('Old password is wrong', 403);
     user[0].password = passwordDto.newPassword;
     user[0].version += 1;
+    user[0].updatedAt = Date.now();
     const { password, ...newUser } = user[0];
     return newUser;
   }

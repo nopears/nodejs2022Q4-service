@@ -16,8 +16,6 @@ export class ArtistsService {
     return artist[0];
   }
   createArtist(artist: CreateArtistDto): Artist {
-    if (!artist.name || !('grammy' in artist))
-      throw new HttpException('Wrong body', 400);
     const newArtist: Artist = { ...artist, id: v4() };
     artists.push(newArtist);
     return newArtist;

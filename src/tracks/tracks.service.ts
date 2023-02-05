@@ -16,13 +16,8 @@ export class TracksService {
     return track[0];
   }
   createTrack(track: CreateTrackDto): Track {
-    if (!track.name || !track.duration || !track.artistId || !track.albumId)
+    if (!track.name || !track.duration)
       throw new HttpException('Wrong body', 400);
-    const artist = artists.filter((a) => a.id === track.artistId)[0];
-    if (!artist)
-      throw new HttpException('Artist not found, check artistId', 404);
-    const album = albums.filter((a) => a.id === track.albumId)[0];
-    if (!album) throw new HttpException('Album` not found, check albumId', 404);
     const newTrack: Track = { ...track, id: v4() };
     tracks.push(newTrack);
     return newTrack;
