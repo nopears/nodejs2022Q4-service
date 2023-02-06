@@ -16,7 +16,7 @@ import { ConfigModule } from '@nestjs/config';
     AlbumsModule,
     FavoritesModule,
     ConfigModule.forRoot({
-      envFilePath: '.env.example',
+      envFilePath: '.env',
     }),
   ],
   controllers: [AppController],

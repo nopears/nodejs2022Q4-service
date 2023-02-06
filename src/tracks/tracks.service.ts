@@ -16,8 +16,6 @@ export class TracksService {
     return track[0];
   }
   createTrack(track: CreateTrackDto): Track {
-    if (!track.name || !track.duration)
-      throw new HttpException('Wrong body', 400);
     const newTrack: Track = { ...track, id: v4() };
     tracks.push(newTrack);
     return newTrack;
