@@ -13,6 +13,7 @@ export class UsersService {
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
   ) {}
+
   async getAll(): Promise<User[]> {
     const users = await this.userRepository.find();
 
@@ -21,6 +22,7 @@ export class UsersService {
       return user;
     });
   }
+
   async get(userId: string): Promise<User> {
     if (!validate(userId)) throw new HttpException('ID is not valid', 400);
 
@@ -31,6 +33,7 @@ export class UsersService {
 
     return newUser;
   }
+
   async createUser(userDto: CreateUserDto): Promise<User> {
     const newUser: User = {
       ...userDto,
@@ -42,6 +45,7 @@ export class UsersService {
 
     return returnUser;
   }
+
   async changePassword(
     userId: string,
     passwordDto: ChangePasswordDto,
@@ -61,6 +65,7 @@ export class UsersService {
 
     return newUser;
   }
+
   async deleteUser(userId: string): Promise<void> {
     if (!validate(userId)) throw new HttpException('ID is not valid', 400);
 

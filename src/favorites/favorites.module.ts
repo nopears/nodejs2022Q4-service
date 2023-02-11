@@ -7,6 +7,6 @@ import { TracksService } from '../tracks/tracks.service';
 
 @Module({
   controllers: [FavoritesController],
-  providers: [FavoritesService, AlbumsService, TracksService],
+  providers: [FavoritesService],
 })
 export class FavoritesModule {}

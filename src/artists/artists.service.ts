@@ -12,9 +12,11 @@ export class ArtistsService {
     @InjectRepository(ArtistEntity)
     private artistRepository: Repository<ArtistEntity>,
   ) {}
+
   async getAll(): Promise<Artist[]> {
     return await this.artistRepository.find();
   }
+
   async get(artistId: string): Promise<Artist> {
     if (!validate(artistId)) throw new HttpException('ID is not valid', 400);
 
@@ -23,12 +25,14 @@ export class ArtistsService {
 
     return artist;
   }
+
   async createArtist(artist: CreateArtistDto): Promise<Artist> {
     const newArtist: Artist = { ...artist, id: v4() };
     await this.artistRepository.insert(newArtist);
 
     return newArtist;
   }
+
   async updateArtist(
     artistId: string,
     artistDto: CreateArtistDto,
@@ -43,6 +47,7 @@ export class ArtistsService {
 
     return artist;
   }
+
   async deleteArtist(artistId: string): Promise<void> {
     if (!validate(artistId)) throw new HttpException('ID is not valid', 400);
 

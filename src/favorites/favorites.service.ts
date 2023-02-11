@@ -9,16 +9,16 @@ import { validate } from 'uuid';
 @Injectable()
 export class FavoritesService {
   constructor(
-    private readonly _albumsService: AlbumsService,
+    // private readonly _albumsService: AlbumsService,
     // private readonly _artistsService: ArtistsService,
-    private readonly _tracksService: TracksService,
+    // private readonly _tracksService: TracksService,
   ) {}
   getAll(): FavoriteResponse[] {
     if (favorites) {
       const res: any = { ...favorites };
-      res.albums = res.albums.map((a) => this._albumsService.get(a));
+      // res.albums = res.albums.map((a) => this._albumsService.get(a));
       // res.artists = res.artists.map((a) => this._artistsService.get(a));
-      res.tracks = res.tracks.map((a) => this._tracksService.get(a));
+      // res.tracks = res.tracks.map((a) => this._tracksService.get(a));
       return res;
     }
     return [];

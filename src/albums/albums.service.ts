@@ -1,43 +1,66 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { albums, favorites, tracks } from '../DB/DB';
 import { Album } from './albums.types';
 import { v4, validate } from 'uuid';
 import { CreateAlbumDto } from './dto/create-album.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AlbumEntity } from './album.entity';
+import { Repository } from 'typeorm';
+import { ArtistEntity } from "../artists/artist.entity";
 
 @Injectable()
 export class AlbumsService {
-  getAll(): Album[] {
-    return albums;
+  constructor(
+    @InjectRepository(AlbumEntity)
+    private albumRepository: Repository<AlbumEntity>,
+    @InjectRepository(ArtistEntity)
+    private artistRepository: Repository<ArtistEntity>,
+
+  ) {}
+
+  async getAll(): Promise<Album[]> {
+    return await this.albumRepository.find();
   }
-  get(albumId: string): Album {
+
+  async get(albumId: string): Promise<Album> {
     if (!validate(albumId)) throw new HttpException('ID is not valid', 400);
-    const album = albums.filter((a) => a.id === albumId);
-    if (!album[0]) throw new HttpException('Album not found', 404);
-    return album[0];
-  }
-  createAlbum(album: CreateAlbumDto): Album {
-    const newAlbum: Album = { ...album, id: v4() };
-    albums.push(newAlbum);
-    return newAlbum;
-  }
-  updateAlbum(albumId: string, albumDto: CreateAlbumDto): Album {
-    if (!validate(albumId)) throw new HttpException('ID is not valid', 400);
-    let album = albums.filter((a) => a.id === albumId)[0];
+
+    const album = this.albumRepository.findOneBy({ id: albumId });
     if (!album) throw new HttpException('Album not found', 404);
-    const aIndex = albums.findIndex((a) => a.id === albumId);
-    album = { ...album, ...albumDto };
-    albums[aIndex] = album;
+
     return album;
   }
-  deleteAlbum(albumId: string): void {
-    if (!validate(albumId)) throw new HttpException('ID is not valid', 400);
-    const album = albums.filter((a) => a.id === albumId)[0];
-    if (!album) throw new HttpException('Album not found', 404);
-    const aIndex = albums.findIndex((a) => a.id === albumId);
-    albums.splice(aIndex, 1);
-    tracks.forEach((t) => {
-      if (t.albumId === albumId) t.albumId = null;
+  async createAlbum(album: CreateAlbumDto): Promise<Album> {
+    const artist = await this.artistRepository.findOneBy({
+      id: album.artistId,
     });
-    favorites.albums = favorites.albums.filter((a) => a !== albumId);
+    if (!artist) throw new HttpException('Artist not found', 404);
+
+    const newAlbum: Album = { ...album, id: v4() };
+    await this.albumRepository.insert(newAlbum);
+
+    return newAlbum;
+  }
+  async updateAlbum(albumId: string, albumDto: CreateAlbumDto): Promise<Album> {
+    if (!validate(albumId)) throw new HttpException('ID is not valid', 400);
+
+    let album = await this.albumRepository.findOneBy({ id: albumId });
+    if (!album) throw new HttpException('Album not found', 404);
+
+    album = { ...album, ...albumDto };
+    await this.albumRepository.save(album);
+
+    return album;
+  }
+  async deleteAlbum(albumId: string): Promise<void> {
+    if (!validate(albumId)) throw new HttpException('ID is not valid', 400);
+
+    const album = await this.albumRepository.findOneBy({ id: albumId });
+    if (!album) throw new HttpException('Album not found', 404);
+
+    await this.albumRepository.delete({ id: albumId });
+    // tracks.forEach((t) => {
+    //   if (t.albumId === albumId) t.albumId = null;
+    // });
+    // favorites.albums = favorites.albums.filter((a) => a !== albumId);
   }
 }
