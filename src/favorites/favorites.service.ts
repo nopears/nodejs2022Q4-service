@@ -16,12 +16,9 @@ export class FavoritesService {
   getAll(): FavoriteResponse[] {
     if (favorites) {
       const res: any = { ...favorites };
-      if (res.albums !== [])
-        res.albums = res.albums.map((a) => this._albumsService.get(a));
-      if (res.artists !== [])
-        res.artists = res.artists.map((a) => this._artistsService.get(a));
-      if (res.tracks !== [])
-        res.tracks = res.tracks.map((a) => this._tracksService.get(a));
+      res.albums = res.albums.map((a) => this._albumsService.get(a));
+      res.artists = res.artists.map((a) => this._artistsService.get(a));
+      res.tracks = res.tracks.map((a) => this._tracksService.get(a));
       return res;
     }
     return [];
