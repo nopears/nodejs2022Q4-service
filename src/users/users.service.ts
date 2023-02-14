@@ -35,12 +35,14 @@ export class UsersService {
   }
 
   async createUser(userDto: CreateUserDto): Promise<User> {
-    const newUser: User = {
+    let newUser: User = {
       ...userDto,
       id: v4(),
       version: 1,
     };
     await this.userRepository.insert(newUser);
+
+    newUser = await this.userRepository.findOneBy({ id: newUser.id });
     const { password, ...returnUser } = newUser;
 
     return returnUser;

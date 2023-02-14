@@ -20,9 +20,24 @@ export class UserEntity {
   @Column('int')
   version: number;
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn({
+    type: 'timestamp',
+    transformer: {
+      to: (value: Date) => {
+        console.log(value);
+        return value;
+      },
+      from: (value: Date) => +value.getTime(),
+    },
+  })
   createdAt: number;
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn({
+    type: 'timestamp',
+    transformer: {
+      to: (value: Date) => value,
+      from: (value: Date) => +value.getTime(),
+    },
+  })
   updatedAt: number;
 }
