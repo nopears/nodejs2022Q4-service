@@ -12,9 +12,9 @@ export class AlbumEntity {
   @Column('int')
   year: number;
 
-  @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.id, {
+  @ManyToOne(() => ArtistEntity, {
     onDelete: 'SET NULL',
   })
-  @JoinColumn({ name: 'artistId' })
+  @JoinColumn()
   artistId: string;
 }

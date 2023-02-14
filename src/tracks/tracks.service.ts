@@ -14,13 +14,18 @@ export class TracksService {
   ) {}
 
   async getAll(): Promise<Track[]> {
-    return await this.trackRepository.find();
+    return await this.trackRepository.find({ loadRelationIds: true });
   }
 
   async get(trackId: string): Promise<Track> {
     if (!validate(trackId)) throw new HttpException('ID is not valid', 400);
 
-    const track = this.trackRepository.findOneBy({ id: trackId });
+    const track = (
+      await this.trackRepository.find({
+        loadRelationIds: true,
+        where: { id: trackId },
+      })
+    )[0];
     if (!track) throw new HttpException('Track not found', 404);
 
     return track;

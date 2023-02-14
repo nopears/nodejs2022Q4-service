@@ -5,7 +5,7 @@ import { CreateAlbumDto } from './dto/create-album.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AlbumEntity } from './album.entity';
 import { Repository } from 'typeorm';
-import { ArtistEntity } from "../artists/artist.entity";
+import { ArtistEntity } from '../artists/artist.entity';
 
 @Injectable()
 export class AlbumsService {
@@ -14,17 +14,21 @@ export class AlbumsService {
     private albumRepository: Repository<AlbumEntity>,
     @InjectRepository(ArtistEntity)
     private artistRepository: Repository<ArtistEntity>,
-
   ) {}
 
   async getAll(): Promise<Album[]> {
-    return await this.albumRepository.find();
+    return await this.albumRepository.find({ loadRelationIds: true });
   }
 
   async get(albumId: string): Promise<Album> {
     if (!validate(albumId)) throw new HttpException('ID is not valid', 400);
 
-    const album = this.albumRepository.findOneBy({ id: albumId });
+    const album = (
+      await this.albumRepository.find({
+        loadRelationIds: true,
+        where: { id: albumId },
+      })
+    )[0];
     if (!album) throw new HttpException('Album not found', 404);
 
     return album;
@@ -58,9 +62,5 @@ export class AlbumsService {
     if (!album) throw new HttpException('Album not found', 404);
 
     await this.albumRepository.delete({ id: albumId });
-    // tracks.forEach((t) => {
-    //   if (t.albumId === albumId) t.albumId = null;
-    // });
-    // favorites.albums = favorites.albums.filter((a) => a !== albumId);
   }
 }
