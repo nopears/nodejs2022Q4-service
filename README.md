@@ -11,16 +11,14 @@
 git clone {repository URL}
 ```
 
-## Installing NPM modules
-
+## Build Docker image
 ```
-npm install --force
+docker-compose build
 ```
 
-## Running application
-
+## Start via Docker
 ```
-npm start
+docker-compose up
 ```
 
 Port must be stored in .env file
