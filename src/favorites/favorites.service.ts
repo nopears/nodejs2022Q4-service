@@ -1,68 +1,155 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { albums, artists, favorites, tracks } from '../DB/DB';
-import { FavoriteResponse } from './favorites.types';
-import { AlbumsService } from '../albums/albums.service';
-import { ArtistsService } from '../artists/artists.service';
-import { TracksService } from '../tracks/tracks.service';
 import { validate } from 'uuid';
+import { InjectRepository } from '@nestjs/typeorm';
+import { FavoritesEntity } from './favorites.entity';
+import { Repository } from 'typeorm';
+import { TrackEntity } from '../tracks/track.entity';
+import { TracksService } from '../tracks/tracks.service';
+import { ArtistEntity } from '../artists/artist.entity';
+import { ArtistsService } from '../artists/artists.service';
+import { AlbumsService } from '../albums/albums.service';
+import { AlbumEntity } from '../albums/album.entity';
 
 @Injectable()
 export class FavoritesService {
   constructor(
-    // private readonly _albumsService: AlbumsService,
-    // private readonly _artistsService: ArtistsService,
-    // private readonly _tracksService: TracksService,
+    @InjectRepository(FavoritesEntity)
+    private favoriteRepository: Repository<FavoritesEntity>,
+    private _tracksService: TracksService,
+    private _artistsService: ArtistsService,
+    private _albumsService: AlbumsService,
   ) {}
-  getAll(): FavoriteResponse[] {
-    if (favorites) {
-      const res: any = { ...favorites };
-      // res.albums = res.albums.map((a) => this._albumsService.get(a));
-      // res.artists = res.artists.map((a) => this._artistsService.get(a));
-      // res.tracks = res.tracks.map((a) => this._tracksService.get(a));
-      return res;
+
+  async getAll(): Promise<any> {
+    const fav = (
+      await this.favoriteRepository.find({
+        relations: { artists: true, tracks: true, albums: true },
+      })
+    )[0];
+
+    if (!fav) {
+      await this.favoriteRepository.insert({
+        artists: [],
+        albums: [],
+        tracks: [],
+      });
+
+      return { artists: [], albums: [], tracks: [] };
     }
-    return [];
+
+    return fav;
   }
-  addTrack(trackId: string) {
+
+  async addTrack(trackId: string) {
     if (!validate(trackId)) throw new HttpException('ID is not valid', 400);
-    const track = tracks.filter((t) => t.id === trackId)[0];
+
+    const track: TrackEntity = await this._tracksService.get(trackId);
     if (!track) throw new HttpException('Track not found', 422);
-    favorites.tracks.push(trackId);
+
+    const fav = (
+      await this.favoriteRepository.find({
+        relations: { tracks: true },
+      })
+    )[0];
+
+    if (!fav.tracks) fav.tracks = [];
+
+    fav.tracks.push(track);
+    await this.favoriteRepository.save(fav);
+
     return 'Track added to favorites';
   }
-  deleteTrack(trackId: string) {
+
+  async deleteTrack(trackId: string) {
     if (!validate(trackId)) throw new HttpException('ID is not valid', 400);
-    if (!favorites.tracks.includes(trackId))
+
+    const track: TrackEntity = await this._tracksService.get(trackId);
+    const fav = (
+      await this.favoriteRepository.find({
+        relations: { tracks: true },
+      })
+    )[0];
+
+    if (!fav.tracks.includes(track))
       throw new HttpException('Track not in favorites', 404);
-    favorites.tracks = favorites.tracks.filter((t) => t !== trackId);
+
+    fav.tracks = fav.tracks.filter((t) => t !== track);
+    await this.favoriteRepository.save(fav);
+
     return 'Track was removed from favorites';
   }
-  addArtist(artistId: string) {
+
+  async addArtist(artistId: string) {
     if (!validate(artistId)) throw new HttpException('ID is not valid', 400);
-    const artist = artists.filter((a) => a.id === artistId)[0];
+
+    const artist: ArtistEntity = await this._artistsService.get(artistId);
     if (!artist) throw new HttpException('Artist not found', 422);
-    favorites.artists.push(artistId);
+
+    const fav = (
+      await this.favoriteRepository.find({
+        relations: { artists: true },
+      })
+    )[0];
+
+    fav.artists.push(artist);
+    await this.favoriteRepository.save(fav);
+
     return 'Artist added to favorites';
   }
-  deleteArtist(artistId: string) {
+
+  async deleteArtist(artistId: string) {
     if (!validate(artistId)) throw new HttpException('ID is not valid', 400);
-    if (!favorites.artists.includes(artistId))
+
+    const artist: ArtistEntity = await this._artistsService.get(artistId);
+    const fav = (
+      await this.favoriteRepository.find({
+        relations: { artists: true },
+      })
+    )[0];
+
+    if (!fav.artists.includes(artist))
       throw new HttpException('Artist not in favorites', 404);
-    favorites.artists = favorites.artists.filter((a) => a !== artistId);
+
+    fav.artists = fav.artists.filter((a) => a !== artist);
+    await this.favoriteRepository.save(fav);
+
     return 'Artist was removed from favorites';
   }
-  addAlbum(albumId: string) {
+
+  async addAlbum(albumId: string) {
     if (!validate(albumId)) throw new HttpException('ID is not valid', 400);
-    const album = albums.filter((a) => a.id === albumId)[0];
+
+    const album: AlbumEntity = await this._albumsService.get(albumId);
     if (!album) throw new HttpException('Album not found', 422);
-    favorites.albums.push(albumId);
+
+    const fav = (
+      await this.favoriteRepository.find({
+        relations: { albums: true },
+      })
+    )[0];
+
+    fav.albums.push(album);
+    await this.favoriteRepository.save(fav);
+
     return 'Album added to favorites';
   }
-  deleteAlbum(albumId: string) {
+
+  async deleteAlbum(albumId: string) {
     if (!validate(albumId)) throw new HttpException('ID is not valid', 400);
-    if (!favorites.albums.includes(albumId))
+
+    const album: AlbumEntity = await this._albumsService.get(albumId);
+    const fav = (
+      await this.favoriteRepository.find({
+        relations: { albums: true },
+      })
+    )[0];
+
+    if (!fav.albums.includes(album))
       throw new HttpException('Album not in favorites', 404);
-    favorites.albums = favorites.albums.filter((a) => a !== albumId);
+
+    fav.albums = fav.albums.filter((a) => a !== album);
+    await this.favoriteRepository.save(fav);
+
     return 'Album was removed from favorites';
   }
 }

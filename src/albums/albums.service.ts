@@ -23,12 +23,10 @@ export class AlbumsService {
   async get(albumId: string): Promise<Album> {
     if (!validate(albumId)) throw new HttpException('ID is not valid', 400);
 
-    const album = (
-      await this.albumRepository.find({
-        loadRelationIds: true,
-        where: { id: albumId },
-      })
-    )[0];
+    const album = await this.albumRepository.findOne({
+      loadRelationIds: true,
+      where: { id: albumId },
+    });
     if (!album) throw new HttpException('Album not found', 404);
 
     return album;

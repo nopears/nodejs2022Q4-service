@@ -55,9 +55,5 @@ export class ArtistsService {
     if (!artist) throw new HttpException('Artist not found', 404);
 
     await this.artistRepository.delete({ id: artistId });
-    // tracks.forEach((t) => {
-    //   if (t.artistId === artistId) t.artistId = null;
-    // });
-    // favorites.artists = favorites.artists.filter((a) => a !== artistId);
   }
 }
